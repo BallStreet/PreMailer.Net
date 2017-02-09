@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using AngleSharp.Dom;
 using PreMailer.Net.Downloaders;
 
@@ -26,22 +27,18 @@ namespace PreMailer.Net.Sources
 			}
 		}
 
-		public string GetCss()
+		public async Task<string> GetCssAsync()
 		{
 			if (IsSupported(_downloadUri.Scheme))
 			{
-				return _cssContents ?? (_cssContents = WebDownloader.SharedDownloader.DownloadString(_downloadUri));
+				return _cssContents ?? (_cssContents = await WebDownloader.SharedDownloader.DownloadStringAsync(_downloadUri));
 			}
 			return string.Empty;
 		}
 
 		private bool IsSupported(string scheme)
 		{
-			return
-				scheme == Uri.UriSchemeHttp ||
-				scheme == Uri.UriSchemeHttps ||
-				scheme == Uri.UriSchemeFtp ||
-				scheme == Uri.UriSchemeFile;
+		    return Uri.CheckSchemeName(scheme);
 		}
 	}
 }

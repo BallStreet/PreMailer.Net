@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace PreMailer.Net.Downloaders
 {
 	public interface IWebDownloader
 	{
-		string DownloadString(Uri uri);
+		Task<string> DownloadStringAsync(Uri uri);
 	}
 }

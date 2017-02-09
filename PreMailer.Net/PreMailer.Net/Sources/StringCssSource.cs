@@ -1,5 +1,7 @@
 ﻿// No usings needed
 
+using System.Threading.Tasks;
+
 namespace PreMailer.Net.Sources
 {
 	public class StringCssSource : ICssSource
@@ -11,8 +13,9 @@ namespace PreMailer.Net.Sources
 			this._css = css;
 		}
 
-		public string GetCss()
+		public async Task<string> GetCssAsync()
 		{
+		    await Task.Yield();
 			return _css;
 		}
 	}

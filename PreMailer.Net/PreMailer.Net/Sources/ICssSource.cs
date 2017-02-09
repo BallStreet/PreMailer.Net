@@ -1,10 +1,13 @@
-﻿namespace PreMailer.Net.Sources
+﻿using System.Threading.Tasks;
+
+namespace PreMailer.Net.Sources
 {
     /// <summary>
     /// Arbitrary source of CSS code/defintions.
     /// </summary>
     public interface ICssSource
     {
-        string GetCss();
+        Task<string> GetCssAsync();
+        //string GetCss();
     }
 }

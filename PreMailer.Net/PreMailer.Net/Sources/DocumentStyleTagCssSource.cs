@@ -1,4 +1,5 @@
-﻿using AngleSharp.Dom;
+﻿using System.Threading.Tasks;
+using AngleSharp.Dom;
 
 namespace PreMailer.Net.Sources
 {
@@ -11,8 +12,9 @@ namespace PreMailer.Net.Sources
 			_node = node;
 		}
 
-		public string GetCss()
+		public async Task<string> GetCssAsync()
 		{
+		    await Task.Yield();
 			return _node.InnerHtml;
 		}
 	}

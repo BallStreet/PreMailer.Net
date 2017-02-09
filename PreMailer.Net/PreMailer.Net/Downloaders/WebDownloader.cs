@@ -1,11 +1,15 @@
 ﻿using System;
 using System.IO;
+using System.Linq.Expressions;
 using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace PreMailer.Net.Downloaders
 {
 	public class WebDownloader : IWebDownloader
 	{
+	    private static HttpClient _client = new HttpClient();
 		private static IWebDownloader _sharedDownloader;
 
 		public static IWebDownloader SharedDownloader
@@ -25,15 +29,9 @@ namespace PreMailer.Net.Downloaders
 			}
 		}
 
-		public string DownloadString(Uri uri)
+		public async Task<string> DownloadStringAsync(Uri uri)
 		{
-			var request = WebRequest.Create(uri);
-			using (var response = request.GetResponse())
-			using (var stream = response.GetResponseStream())
-			using (var reader = new StreamReader(stream))
-			{
-				return reader.ReadToEnd();
-			}
+		    return await _client.GetStringAsync(uri);
 		}
 	}
 }

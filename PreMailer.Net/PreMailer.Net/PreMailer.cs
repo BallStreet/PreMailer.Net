@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Threading.Tasks;
 using AngleSharp;
 using AngleSharp.Dom;
 using AngleSharp.Dom.Html;
@@ -47,9 +48,9 @@ namespace PreMailer.Net
 		/// <param name="stripIdAndClassAttributes">True to strip ID and class attributes</param>
 		/// <param name="removeComments">True to remove comments, false to leave them intact</param>
 		/// <returns>Returns the html input, with styles moved to inline attributes.</returns>
-		public static InlineResult MoveCssInline(string html, bool removeStyleElements = false, string ignoreElements = null, string css = null, bool stripIdAndClassAttributes = false, bool removeComments = false)
+		public async static Task<InlineResult> MoveCssInlineAsync(string html, bool removeStyleElements = false, string ignoreElements = null, string css = null, bool stripIdAndClassAttributes = false, bool removeComments = false)
 		{
-			return new PreMailer(html).MoveCssInline(removeStyleElements, ignoreElements, css, stripIdAndClassAttributes, removeComments);
+            return await new PreMailer(html).MoveCssInlineAsync(removeStyleElements, ignoreElements, css, stripIdAndClassAttributes, removeComments);
 		}
 
 		/// <summary>
@@ -64,9 +65,9 @@ namespace PreMailer.Net
 		/// <param name="stripIdAndClassAttributes">True to strip ID and class attributes</param>
 		/// <param name="removeComments">True to remove comments, false to leave them intact</param>
 		/// <returns>Returns the html input, with styles moved to inline attributes.</returns>
-		public static InlineResult MoveCssInline(Uri baseUri, string html, bool removeStyleElements = false, string ignoreElements = null, string css = null, bool stripIdAndClassAttributes = false, bool removeComments = false)
+		public async static Task<InlineResult> MoveCssInlineAsync(Uri baseUri, string html, bool removeStyleElements = false, string ignoreElements = null, string css = null, bool stripIdAndClassAttributes = false, bool removeComments = false)
 		{
-			return new PreMailer(html, baseUri).MoveCssInline(removeStyleElements, ignoreElements, css, stripIdAndClassAttributes, removeComments);
+			return await new PreMailer(html, baseUri).MoveCssInlineAsync(removeStyleElements, ignoreElements, css, stripIdAndClassAttributes, removeComments);
 		}
 
 		/// <summary>
@@ -78,7 +79,7 @@ namespace PreMailer.Net
 		/// <param name="stripIdAndClassAttributes">True to strip ID and class attributes</param>
 		/// <param name="removeComments">True to remove comments, false to leave them intact</param>
 		/// <returns>Returns the html input, with styles moved to inline attributes.</returns>
-		public InlineResult MoveCssInline(bool removeStyleElements = false, string ignoreElements = null, string css = null, bool stripIdAndClassAttributes = false, bool removeComments = false)
+		public async Task<InlineResult> MoveCssInlineAsync(bool removeStyleElements = false, string ignoreElements = null, string css = null, bool stripIdAndClassAttributes = false, bool removeComments = false)
 		{
 			// Store the variables used for inlining the CSS
 			_removeStyleElements = removeStyleElements;
@@ -92,7 +93,7 @@ namespace PreMailer.Net
 			var cssSources = new List<ICssSource>(ConvertToStyleSources(cssSourceNodes));
 			cssSources.AddRange(ConvertToStyleSources(cssLinkNodes));
 
-			var cssBlocks = GetCssBlocks(cssSources);
+			var cssBlocks = await GetCssBlocksAsync(cssSources);
 
 			if (_removeStyleElements)
 			{
@@ -169,13 +170,13 @@ namespace PreMailer.Net
 		/// Returns the blocks of CSS within the documents supported CSS sources.<para/>
 		/// Blocks are returned in the order they are declared within the document.
 		/// </summary>
-		private IEnumerable<string> GetCssBlocks(IEnumerable<ICssSource> cssSources)
+		private async Task<IEnumerable<string>> GetCssBlocksAsync(IEnumerable<ICssSource> cssSources)
 		{
 			var styleBlocks = new List<string>();
 
 			foreach (var styleSource in cssSources)
 			{
-				styleBlocks.Add(styleSource.GetCss());
+				styleBlocks.Add(await styleSource.GetCssAsync());
 			}
 
 			return styleBlocks;
@@ -384,7 +385,7 @@ namespace PreMailer.Net
 				selectors.Add(String.Format("*[{0}]", attribute));
 			}
 
-			var elementsWithAttributes = _document.QuerySelectorAll(String.Join(",", selectors.Cast<string>().ToList()));
+			var elementsWithAttributes = _document.QuerySelectorAll(string.Join(",", (IEnumerable<string>) selectors.Cast<string>().ToList()));
 			foreach (var item in elementsWithAttributes)
 			{
 				foreach (var attribute in attributeNames)
